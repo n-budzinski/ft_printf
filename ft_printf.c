@@ -8,12 +8,12 @@
 /*    ▪        ·▀ ·▀▀▀ •    ▀▀▀▀ ▀▪ ▀  ▀ .▀  ▀ ▀▀▀▀  ▀  ▀  ▀▀▀▀ ▀             */
 /*                                                          .           ▪     */
 /*            .                                    .                          */
-/*   main.c             ▪             .                                       */
+/*   ft_printf.c        ▪             .                                       */
 /*   .                                                                        */
 /*   By: nbudzins <nbudzins@student.42warsaw.pl>            ▪                 */
 /*                                                                   .        */
-/*   Created: 2024/03/14 08:47:16 by nbudzins                                 */
-/*   Updated: 2024/03/17 09:03:14 by nbudzins                                 */
+/*   Created: 2024/03/23 00:11:36 by nbudzins                                 */
+/*   Updated: 2024/03/23 03:38:47 by nbudzins                                 */
 /*                                               .                 .          */
 /* ************************************************************************** */
 
@@ -22,6 +22,7 @@
 #include <unistd.h>
 #include <stdarg.h>
 #include <string.h>
+#include "./libft/libft.h"
 
 typedef struct fields_s
 {
@@ -103,30 +104,36 @@ static size_t	print_hex(unsigned long long value, char *set)
 	return (0);
 }
 
-size_t	handle_chr(fields_t *fields, int value)
+void	handle_chr(fields_t *fields, int c, t_list **lst)
 {
-	write(1, &value, 1);
-	return (1);
+	t_list	*node;
+	char 	str[2];
+
+	str[0] = c;
+	str[1] = '\0';
+	node = ft_lstnew(ft_strdup(str));
+	if (node)
+		ft_lstadd_back(lst, node);
 }
 
-size_t	handle_str(fields_t *fields, char *value)
+void	handle_str(fields_t *fields, char *str, t_list **lst)
 {
-	int len;
-	len = strlen(value);
-	write(1, value, len);
-	return (0);
+	t_list	*node;
+
+	node = ft_lstnew(ft_strdup(str));
+	if (node)
+		ft_lstadd_back(lst, node);
 }
 
 size_t	handle_ptr(fields_t *fields, unsigned long long value)
 {
-	write(1, "0x", 2);
-	print_hex(value, "0123456789abcdef");
-	return (0);
+	if (!value)
+		return (write(1, "(nil)", 6));
+	return (write(1, "0x", 2) + print_hex(value, "0123456789abcdef"));
 }
 
 size_t	handle_dec(fields_t *fields, int value)
 {
-	//TODO
 	return (0);
 }
 
@@ -166,59 +173,113 @@ size_t	handle_uhex(fields_t *fields, unsigned int value)
 	return (print_hex(value, "0123456789ABCDEF"));
 }
 
-size_t	handle_esc()
+void	handle_esc(t_list **lst)
 {
-	return (write(1, "%", 1));
+	t_list	*node;
+
+	node = ft_lstnew(ft_strdup("%"));
+	if (node)
+		ft_lstadd_back(lst, node);
 }
 
-static void	format_handler(char **fstring, va_list ap, size_t *nchr)	
+void	format_handler(char **fstring, t_list **lst, va_list ap)	
 {
-	fields_t *fields;
+	fields_t	*fields;
 
 	fields = new_fields();
 	if (!fields)
 		return ;
 	set_fields(fields, fstring);
 	if (**fstring == 'c')
-		*nchr += handle_chr(fields, va_arg(ap, int));
+		handle_chr(fields, va_arg(ap, int), lst);
 	else if (**fstring == 's')
-		*nchr += handle_str(fields, va_arg(ap, char*));
+		handle_str(fields, va_arg(ap, char*), lst);
 	else if (**fstring == 'p')
-		*nchr += handle_ptr(fields, va_arg(ap, unsigned long long));
+		handle_ptr(fields, va_arg(ap, unsigned long long));
 	else if (**fstring == 'd' || **fstring == 'i')
-		*nchr += handle_dec(fields, va_arg(ap, int));
+		handle_dec(fields, va_arg(ap, int));
 	else if (**fstring == 'u')
-		*nchr += handle_uint(fields, va_arg(ap, unsigned int));
+		handle_uint(fields, va_arg(ap, unsigned int));
 	else if (**fstring == 'x')
-		*nchr += handle_lhex(fields, va_arg(ap, unsigned int));
+		handle_lhex(fields, va_arg(ap, unsigned int));
 	else if (**fstring == 'X')
-		*nchr += handle_uhex(fields, va_arg(ap, unsigned int));
+		handle_uhex(fields, va_arg(ap, unsigned int));
 	else if	(**fstring == '%')
-		*nchr += handle_esc();
+		handle_esc(lst);
+	free(fields);
 	(*fstring)++;
+}
+
+char	*ft_strndup(const char *s, size_t n)
+{
+	void	*ptr;
+
+	ptr = (char *)malloc(n + 1);
+	if (ptr == NULL)
+		return (NULL);
+	ft_strlcpy(ptr, s, n + 1);
+	return (ptr);
+}
+
+char	*ft_lststr_join(t_list *lst)
+{
+	char	*str;
+	char	*tmp;
+
+	str = ft_strdup("");
+	while (lst)
+	{
+		tmp = ft_strjoin(str, (const char *)(lst->content));
+		free(str);
+		str = tmp;
+		lst = lst->next;
+	}
+	return (str);
 }
 
 int	ft_printf(const char *fstring, ...)
 {
 
-	int		nchars;
 	va_list		ap;
-	char		*ptr;
-	size_t		nchr;
+	char		*str;
+	t_list		*lst;
+	char		*sym;
+	char		*sub;
+	t_list		*new;
+	size_t		count;
+	lst = NULL;
 
-	ptr = (char *)fstring;
+	str = (char *)fstring;
 	va_start(ap, fstring);
-
-	while (*ptr != '\0')
-		if (*ptr == '%')
+	while(*str != '\0')
+	{
+		sym = ft_strchr(str, '%');
+		if (sym == NULL)
 		{
-			ptr++;
-			format_handler(&ptr, ap, &nchr);
+			sub = ft_strdup(str);
+			new = ft_lstnew(sub);
+			ft_lstadd_back(&lst, new);
+			break;
 		}
 		else
-			write(1, ptr++, 1);
+		{
+			if (fstring != sym)
+			{
+				sub = ft_strndup(str, (size_t)(sym - str));
+				new = ft_lstnew(sub);
+				ft_lstadd_back(&lst, new);
+				str = sym;
+			}
+			str++;
+			format_handler(&str, &lst, ap);
+		}
+	}
+	str = ft_lststr_join(lst);
+	count = write(1, str, ft_strlen(str));
+	ft_lstclear(&lst, &free);
+	free(str);
 	va_end(ap);
-	return (nchr);
+	return (count);
 }
 
 int	main()
@@ -227,7 +288,8 @@ int	main()
 	char *word2 = "CRUEL";
 	char c = '!';
 	unsigned int uint = 94121;
-	ft_printf("HELLO, %s %s WORLD%c %#X\n", word, word2, c, uint);
-	printf("HELLO, %s %s WORLD%c %#X\n", word, word2, c, uint);
+	ft_printf("HELLO, %s %s WORLD%c", word, word2, c);
+	//ft_printf("HELLO, %s %s WORLD%c %#X%p\n", word, word2, c, uint, NULL);
+	//printf("HELLO, %s %s WORLD%c %#X%p\n", word, word2, c, uint, NULL);
 	return (0);
 }
