@@ -13,7 +13,7 @@
 /*   By: nbudzins <nbudzins@student.42warsaw.pl>            ▪                 */
 /*                                                                   .        */
 /*   Created: 2024/03/23 00:11:36 by nbudzins                                 */
-/*   Updated: 2024/03/23 03:38:47 by nbudzins                                 */
+/*   Updated: 2024/03/24 02:30:55 by nbudzins                                 */
 /*                                               .                 .          */
 /* ************************************************************************** */
 
@@ -49,6 +49,15 @@ static fields_t *new_fields()
 	return (fields);
 } 
 
+static void	ft_lststr_append(t_list **lst, char *str)
+{
+	t_list	*node;
+
+	node = ft_lstnew(ft_strdup(str));
+	if (node)
+		ft_lstadd_back(lst, node);
+
+}
 static void set_fields(fields_t *fields, char **fstring)
 {
 	while (**fstring)
@@ -71,118 +80,129 @@ static void set_fields(fields_t *fields, char **fstring)
 	//fields->flg_width = ft_atoi(*fstring);
 }
 
-static void	uitoa(unsigned int value)
+static void	uitoa(unsigned int value, t_list **lst)
 {
-	char c;
+	unsigned int	tmp;
+	unsigned int	mem;
+	t_list		*node;
+	char		*str;
 
-	c = value % 10 + '0';
-	if (value > 9)
+	mem = 1;
+	tmp = value;
+	while (tmp)
 	{
-		value /= 10;
-		uitoa(value);
+		tmp /= 10;
+		mem++;
 	}
-	write(1, &c, 1);
+	str = malloc(mem + 1);
+	mem--;
+	str[mem] = '\0';
+	while (value > 9)
+	{
+		str[--mem] = value % 10 + '0';
+		value /= 10;
+	}
+	str[0] = value % 10 + '0';
+	ft_lststr_append(lst, str);
 }
 
-static size_t	print_hex(unsigned long long value, char *set)
+char	*ft_ulltohexa(unsigned long long value, char *set)
 {
-	char c;
-	char bitshift;
-	char start;
+	char	shift;
+	char	start;
+	char	*str;
+	int	len;
 
 	start = 0;
-	bitshift = 64;
-	while (bitshift)
+	shift = 64;
+	str = NULL;
+	while (--shift >= 0)
 	{
-		bitshift -= 4;
-		c = value >> bitshift & 0x0F;
-		if (!start && c)
+		if (!start && value >> shift & 0x0F || shift == 0)
 			start = 1;
 		if (start)
-			write(1, &(set[c]), 1);
+		{
+			if (str == NULL)
+			{
+				len = shift / 4 + 1;
+				str = (char *)ft_calloc(len + 1, sizeof(char));
+				if (str == NULL)
+					break ;
+			}
+			str[len - 1 - (shift / 4)] = set[value >> shift & 0x0F];
+		}
 	}
-	return (0);
+	return (str);
 }
 
-void	handle_chr(fields_t *fields, int c, t_list **lst)
+static void	handle_chr(fields_t *fields, int c, t_list **lst)
 {
 	t_list	*node;
 	char 	str[2];
 
 	str[0] = c;
 	str[1] = '\0';
-	node = ft_lstnew(ft_strdup(str));
-	if (node)
-		ft_lstadd_back(lst, node);
+	ft_lststr_append(lst, str);
 }
 
-void	handle_str(fields_t *fields, char *str, t_list **lst)
+static void	handle_str(fields_t *fields, char *str, t_list **lst)
 {
-	t_list	*node;
-
-	node = ft_lstnew(ft_strdup(str));
-	if (node)
-		ft_lstadd_back(lst, node);
+	ft_lststr_append(lst, str);
 }
-
-size_t	handle_ptr(fields_t *fields, unsigned long long value)
+static void handle_ptr(fields_t *fields, unsigned long long value, t_list **lst)
 {
 	if (!value)
-		return (write(1, "(nil)", 6));
-	return (write(1, "0x", 2) + print_hex(value, "0123456789abcdef"));
+		ft_lststr_append(lst, "(nil)");
+	else
+	{
+		ft_lststr_append(lst, "0x");
+		ft_lststr_append(lst, ft_ulltohexa(value, "0123456789abcdef"));
+	}
 }
 
-size_t	handle_dec(fields_t *fields, int value)
+static void	handle_dec(fields_t *fields, int value, t_list **lst)
 {
-	return (0);
+	return ;
 }
 
-size_t	handle_uint(fields_t *fields, unsigned int value)
+static void	handle_uint(fields_t *fields, unsigned int value, t_list **lst)
 {
-	uitoa(value);
-	return (0);
-
+	uitoa(value, lst);
 }
-size_t	handle_int(fields_t *fields, int value)
+
+static void	handle_int(fields_t *fields, int value, t_list **lst)
 {
 	if (value == -2147483648)
-	{
-		write(1, "-2147483648", 11);
-		return (11);
-	}
+		ft_lststr_append(lst, "-2147483648");
 	else if (value < 0)
 	{
 		write(1, "-", 1);
 		value *= -1;
 	} 
-	uitoa(value);
-	return (0);
+	uitoa(value, lst);
 }
 
-size_t	handle_lhex(fields_t *fields, unsigned int value)
+static void	handle_lhex(fields_t *fields, unsigned int value, t_list **lst)
 {
 	if (fields->flg_alt)
-		write(1, "0x", 2);
-	return (print_hex(value, "0123456789abcdef"));
+		ft_lststr_append(lst, "0x");
+	ft_lststr_append(lst, ft_ulltohexa(value, "0123456789abcdef"));
 }
 
-size_t	handle_uhex(fields_t *fields, unsigned int value)
+static void	handle_uhex(fields_t *fields, unsigned int value, t_list **lst)
 {
 	if (fields->flg_alt)
-		write(1, "0x", 2);
-	return (print_hex(value, "0123456789ABCDEF"));
+		ft_lststr_append(lst, "0x");
+	ft_lststr_append(lst, ft_ulltohexa(value, "0123456789ABCDEF"));
 }
 
-void	handle_esc(t_list **lst)
+static void	handle_esc(t_list **lst)
 {
-	t_list	*node;
-
-	node = ft_lstnew(ft_strdup("%"));
-	if (node)
-		ft_lstadd_back(lst, node);
+	ft_lststr_append(lst, "%");
 }
 
-void	format_handler(char **fstring, t_list **lst, va_list ap)	
+
+static void	format_handler(char **fstring, t_list **lst, va_list ap)	
 {
 	fields_t	*fields;
 
@@ -195,15 +215,15 @@ void	format_handler(char **fstring, t_list **lst, va_list ap)
 	else if (**fstring == 's')
 		handle_str(fields, va_arg(ap, char*), lst);
 	else if (**fstring == 'p')
-		handle_ptr(fields, va_arg(ap, unsigned long long));
+		handle_ptr(fields, va_arg(ap, unsigned long long), lst);
 	else if (**fstring == 'd' || **fstring == 'i')
-		handle_dec(fields, va_arg(ap, int));
+		handle_dec(fields, va_arg(ap, int), lst);
 	else if (**fstring == 'u')
-		handle_uint(fields, va_arg(ap, unsigned int));
+		handle_uint(fields, va_arg(ap, unsigned int), lst);
 	else if (**fstring == 'x')
-		handle_lhex(fields, va_arg(ap, unsigned int));
+		handle_lhex(fields, va_arg(ap, unsigned int), lst);
 	else if (**fstring == 'X')
-		handle_uhex(fields, va_arg(ap, unsigned int));
+		handle_uhex(fields, va_arg(ap, unsigned int), lst);
 	else if	(**fstring == '%')
 		handle_esc(lst);
 	free(fields);
@@ -288,7 +308,8 @@ int	main()
 	char *word2 = "CRUEL";
 	char c = '!';
 	unsigned int uint = 94121;
-	ft_printf("HELLO, %s %s WORLD%c", word, word2, c);
+	ft_printf("HELLO, %s %s WORLD%c%p\n", word, word2, c, word);
+	printf("HELLO, %s %s WORLD%c%p\n", word, word2, c, word);
 	//ft_printf("HELLO, %s %s WORLD%c %#X%p\n", word, word2, c, uint, NULL);
 	//printf("HELLO, %s %s WORLD%c %#X%p\n", word, word2, c, uint, NULL);
 	return (0);
