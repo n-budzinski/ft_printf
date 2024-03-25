@@ -17,10 +17,11 @@
 /*                                               .                 .          */
 /* ************************************************************************** */
 
-#ifndef FT_PRINTF
-# define FT_PRINTF
+#ifndef PRINTF_H
+# define PRINTF_H
 
 //FOR TESTING ONLY!
 #include <stdio.h>
 
 //////////////////
+#endif
