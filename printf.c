@@ -13,7 +13,7 @@
 /*   By: nbudzins <nbudzins@student.42warsaw.pl>            ▪                 */
 /*                                                                   .        */
 /*   Created: 2024/03/23 00:11:36 by nbudzins                                 */
-/*   Updated: 2024/03/24 22:22:58 by nbudzins                                 */
+/*   Updated: 2024/03/25 23:16:53 by nbudzins                                 */
 /*                                               .                 .          */
 /* ************************************************************************** */
 
@@ -278,7 +278,7 @@ static void	handle_str(t_fields *fields, char *str, t_list **lst)
 		ft_lst_memblock_append(lst, ft_create_padding(fields->width - len, ' '), fields->width - len);
 }
 
-// static void handle_ptr(t_fields *fields, unsigned long long value, t_list **lst)
+ static void handle_ptr(t_fields *fields, unsigned long long value, t_list **lst)
 // {
 // 	if (!value)
 // 		ft_lststr_append(lst, ft_strdup("(nil)"));
@@ -342,8 +342,8 @@ void	fmt_parse(char **fstring, t_list **lst, va_list ap)
 		handle_chr(fields, va_arg(ap, int), lst);
 	if (**fstring == 's')
 		handle_str(fields, va_arg(ap, char*), lst);
-	// else if (**fstring == 'p')
-	// 	handle_ptr(fields, va_arg(ap, unsigned long long), lst);
+	 else if (**fstring == 'p')
+	 	handle_ptr(fields, va_arg(ap, unsigned long long), lst);
 	// else if (**fstring == 'd' || **fstring == 'i')
 	// 	handle_dec(fields, va_arg(ap, int), lst);
 	// else if (**fstring == 'u')
