@@ -3,6 +3,10 @@
         "sstream": "c",
         "random": "c",
         "limits": "c",
-        "algorithm": "c"
+        "algorithm": "c",
+        "ft_printf.h": "c",
+        "stdlib.h": "c",
+        "bitset": "c",
+        "set": "c"
     }
 }
