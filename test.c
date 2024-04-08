@@ -3,8 +3,8 @@
 
 int	main()
 {
-    int ptr = 22222;
-	printf("%x\n", ptr);
-	ft_printf("%x\n", ptr);
+    char *str = "hello";
+	printf("%s\n", str);
+	ft_printf("%s\n", str);
 	return (0);
 }

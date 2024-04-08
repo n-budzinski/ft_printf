@@ -20,6 +20,7 @@ void    handle_str(t_fields *fields, char *str, t_list **lst)
 	char				*ptr;
 	unsigned long long	len;
 
+	#include <stdio.h>
 	if (str == NULL)
 		return ;
 	len = ft_strlen(str);
@@ -34,12 +35,8 @@ void    handle_str(t_fields *fields, char *str, t_list **lst)
 			ft_memcpy(ptr + fields->width - len, str, len);
 	}
 	else
-	{
-
 		ptr = ft_strndup(str, len);
-		fields->width = len;
-	}
-	ft_lst_memblock_append(lst, ptr, fields->width);
+	ft_lst_memblock_append(lst, ptr, len);
 }
 
 void	handle_esc(t_list **lst)

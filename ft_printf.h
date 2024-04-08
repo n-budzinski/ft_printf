@@ -51,7 +51,7 @@ void ft_lst_memblock_clear(void *memblock);
 void	handle_chr(t_fields *fields, int c, t_list **lst);
 void    handle_str(t_fields *fields, char *str, t_list **lst);
 void	handle_esc(t_list **lst);
-static char	*ft_uitoa(unsigned int value, t_list **lst);
+static char	*ft_uitoa(unsigned int value);
 static char	*ft_ulltohexa(unsigned long long value, char *set);
 void	handle_uint(t_fields *fields, unsigned int value, t_list **lst);
 void	handle_dec(t_fields *fields, int value, t_list **lst);
