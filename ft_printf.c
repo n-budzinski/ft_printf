@@ -32,7 +32,7 @@ static t_fields	*new_fields(void)
 	fields->flg_zero = 0;
 	fields->flg_alt = 0;
 	fields->width = 0;
-	fields->precision = 0;
+	fields->precision = -1;
 	return (fields);
 } 
 
@@ -87,7 +87,7 @@ static void	fmt_parse(char **fstring, t_list **lst, va_list ap)
 	else if (**fstring == 'X')
 		handle_uhex(fields, va_arg(ap, unsigned int), lst);
 	else if	(**fstring == '%')
-		handle_esc(lst);
+		handle_esc(fields, lst);
 	free(fields);
 	(*fstring)++;
 }

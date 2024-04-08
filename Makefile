@@ -24,6 +24,8 @@ $(NAME): $(OBJ)
 
 all: $(NAME)
 
+bonus: all
+
 clean:
 	@make -C $(LIBFT_SRC) $(MAKECMDGOALS)
 	$(RM) $(OBJ)

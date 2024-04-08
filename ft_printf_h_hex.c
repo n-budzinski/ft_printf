@@ -7,9 +7,8 @@ static char	*ft_ulltohexa(unsigned long long value, char *set)
 	char	shift;
 	char	start;
 	char	*str;
-	int	len;
+	int		len;
 
-	//printf("> %llx", value);
 	start = 0;
 	shift = 64;
 	str = NULL;
@@ -35,8 +34,8 @@ static char	*ft_ulltohexa(unsigned long long value, char *set)
 
 void handle_ptr(t_fields *fields, unsigned long long value, t_list **lst)
 {
-	unsigned long long	len;
-	char				*str;
+	int		len;
+	char	*str;
 
 	str = ft_ulltohexa(value, "0123456789abcdef");
 	len = ft_strlen(str) + 2;
@@ -44,8 +43,11 @@ void handle_ptr(t_fields *fields, unsigned long long value, t_list **lst)
 		str = join_and_free(ft_pad(fields->precision, '0'), str);
 	str = join_and_free(ft_strdup("0x"), str);
 	if (fields->width > len)
+	{
 		apply_padding((void **)(&str), len, fields->width, fields->flg_minus);
-	if (fields->precision && fields->precision > len)
+		len = fields->width;
+	}
+	if (fields->precision >= 0 && fields->precision > len)
 		len = fields->precision;
 	ft_lst_memblock_append(lst, str, len);
 }
@@ -68,7 +70,10 @@ static void	handle_hex(t_fields *fields, t_list **lst, char *str)
 		len += 2;
 	}
 	if (fields->width > len)
+	{
 		apply_padding((void **)(&str), len, fields->width, fields->flg_minus);
+		len = fields->width;
+	}
 	ft_lst_memblock_append(lst, str, len);
 }
 

@@ -1,0 +1,34 @@
+#!/bin/sh
+
+git pull
+
+NOSAN=
+BONUS=
+
+
+if [ $# -eq 0 ] || ([ $# -eq 1 ] && [ "$1" = "nosan" ])
+then
+	BONUS="bonus"
+fi
+
+for i in $@
+do
+	if [ "$i" = "nosan" ]
+	then
+		NOSAN="nosan"
+	fi
+	if [ "$i" = "b" ] || [ "$i" = "b1" ] || [ "$i" = "b2" ]
+	then
+		BONUS="bonus"
+	fi
+done
+
+make ${BONUS}${NOSAN}
+
+if [ $? -ne 0 ]
+then
+	echo -e "\ncompilation error kkkkkkkkkkkkkkkkkkkk"
+else
+	echo "./tester $@ 2>myleaks.txt"
+	LSAN_OPTIONS=exitcode=30 ./tester $@ 2>myleaks.txt
+fi

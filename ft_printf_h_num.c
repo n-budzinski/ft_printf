@@ -1,20 +1,36 @@
 #include "ft_printf.h"
 
-static char	*ft_uitoa(unsigned int value)
+static size_t	calcsize(long value)
 {
-	unsigned int	tmp;
+	size_t	buffsize;
+
+	buffsize = 0;
+	if (value == 0)
+		buffsize++;
+	else
+	{
+		if (value < 0)
+		{
+			buffsize++;
+		}
+		while (value)
+		{
+			buffsize++;
+			value /= 10;
+		}
+	}
+	return (buffsize);
+}
+
+static char	*ft_uitoa(long value)
+{
 	unsigned int	mem;
 	char		*str;
 
 	if (value == 0)
 		return (ft_strdup("0"));
 	mem = 0;
-	tmp = value;
-	while (tmp)
-	{
-		tmp /= 10;
-		mem++;
-	}
+
 	str = malloc(mem + 1);
 	if (str == NULL)
 		return (NULL);

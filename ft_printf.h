@@ -39,8 +39,8 @@ typedef struct s_fields
 	char			flg_space;
 	char			flg_zero;
 	char			flg_alt;
-	unsigned int	width;
-	unsigned int	precision;
+	int	width;
+	int	precision;
 }	t_fields;
 
 void	ft_lst_memblock_prepend(t_list **lst, void *mem, size_t size);
@@ -50,8 +50,7 @@ void	*ft_lst_memblock_join(t_list *lst);
 void ft_lst_memblock_clear(void *memblock);
 void	handle_chr(t_fields *fields, int c, t_list **lst);
 void    handle_str(t_fields *fields, char *str, t_list **lst);
-void	handle_esc(t_list **lst);
-static char	*ft_uitoa(unsigned int value);
+void	handle_esc(t_fields *fields, t_list **lst);
 static char	*ft_ulltohexa(unsigned long long value, char *set);
 void	handle_uint(t_fields *fields, unsigned int value, t_list **lst);
 void	handle_dec(t_fields *fields, int value, t_list **lst);
@@ -69,4 +68,7 @@ static void set_fields(t_fields *fields, char **fstring);
 static void	fmt_parse(char **fstring, t_list **lst, va_list ap)	;
 static void	striter(va_list ap, const char *fstring, char *str, t_list **lst);
 int	ft_printf(const char *fstring, ...);
+static char	*ft_uitoa(long value);
+static size_t	calcsize(long value);
+
 #endif
