@@ -12,7 +12,7 @@ void	handle_chr(t_fields *fields, int c, t_list **lst)
 	len = 1;
 	if (fields->width > len)
 	{
-		apply_padding((void **)(&str), len, fields->width, fields->flg_minus);
+		apply_padding(fields, (void **)(&str), len);
 		len = fields->width;
 	}
 	ft_lst_memblock_append(lst, str, len);
@@ -31,7 +31,7 @@ void    handle_str(t_fields *fields, char *str, t_list **lst)
 		len = fields->precision;
 	if (fields->width > len)
 	{
-		apply_padding((void **)(&str), len, fields->width, fields->flg_minus);
+		apply_padding(fields, (void **)(&str), len);
 		len = fields->width;
 	}
 	ft_lst_memblock_append(lst, str, len);
@@ -46,7 +46,7 @@ void	handle_esc(t_fields *fields, t_list **lst)
 	len = 1;
 	if (fields->width > len)
 	{
-		apply_padding((void **)(&str), len, fields->width, fields->flg_minus);
+		apply_padding(fields, (void **)(&str), len);
 		len = fields->width;
 	}
 	ft_lst_memblock_append(lst, str, len);

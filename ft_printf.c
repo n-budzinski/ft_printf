@@ -18,6 +18,7 @@
 /* ************************************************************************** */
 
 #include "ft_printf.h"
+#include <stdio.h>
 
 static t_fields	*new_fields(void)
 {

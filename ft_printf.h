@@ -62,13 +62,13 @@ char	*join_and_free(char *s1, char *s2);
 void	*ft_memjoin(void *m1, size_t m1_size, void *m2, size_t m2_size);
 char    *ft_pad(size_t n, int c);
 char	*ft_strndup(const char *s, size_t n);
-void apply_padding(void **str, size_t len, size_t width, char flg_minus);
+void apply_padding(t_fields *fields, void **str, size_t len);
 static t_fields	*new_fields(void);
 static void set_fields(t_fields *fields, char **fstring);
 static void	fmt_parse(char **fstring, t_list **lst, va_list ap)	;
 static void	striter(va_list ap, const char *fstring, char *str, t_list **lst);
 int	ft_printf(const char *fstring, ...);
-static char	*ft_uitoa(long value);
-static size_t	calcsize(long value);
+static char	*ft_padded_itoa(long value, int padding);
+static int	calcsize(long value, int padding);
 
 #endif

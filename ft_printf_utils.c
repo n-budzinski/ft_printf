@@ -64,15 +64,15 @@ char	*ft_strndup(const char *s, size_t n)
 }
 
 
-void apply_padding(void **str, size_t len, size_t width, char flg_minus)
+void apply_padding(t_fields *fields, void **str, size_t len)
 {
 	void	*ptr;
 
-	ptr = ft_pad(width, ' ');
-	if (flg_minus)
+	ptr = ft_pad(fields->width, ' ');
+	if (fields->flg_minus)
 		ft_memcpy(ptr, *str, len);
 	else
-		ft_memcpy(ptr + width - len, *str, len);
+		ft_memcpy(ptr + fields->width - len, *str, len);
 	free(*str);
 	*str = ptr;
 }

@@ -44,7 +44,7 @@ void handle_ptr(t_fields *fields, unsigned long long value, t_list **lst)
 	str = join_and_free(ft_strdup("0x"), str);
 	if (fields->width > len)
 	{
-		apply_padding((void **)(&str), len, fields->width, fields->flg_minus);
+		apply_padding(fields, (void **)(&str), len);
 		len = fields->width;
 	}
 	if (fields->precision >= 0 && fields->precision > len)
@@ -62,7 +62,7 @@ static void	handle_hex(t_fields *fields, t_list **lst, char *str)
 	{
 		ptr = ft_pad(fields->precision - len, '0');
 		str = ft_memjoin(ptr, fields->precision - len, str, len);
-		len = len * 2 - fields->precision;
+		len = fields->precision;
 	}
 	if (fields->flg_alt)
 	{
@@ -71,7 +71,7 @@ static void	handle_hex(t_fields *fields, t_list **lst, char *str)
 	}
 	if (fields->width > len)
 	{
-		apply_padding((void **)(&str), len, fields->width, fields->flg_minus);
+		apply_padding(fields, (void **)(&str), len);
 		len = fields->width;
 	}
 	ft_lst_memblock_append(lst, str, len);
@@ -79,10 +79,16 @@ static void	handle_hex(t_fields *fields, t_list **lst, char *str)
 
 void	handle_lhex(t_fields *fields, unsigned int value, t_list **lst)
 {
-	handle_hex(fields, lst, ft_ulltohexa(value, "0123456789abcdef"));
+	if (fields->precision == 0 && value == 0)
+		handle_hex(fields, lst, ft_strdup(""));
+	else
+		handle_hex(fields, lst, ft_ulltohexa(value, "0123456789abcdef"));
 }
 
 void	handle_uhex(t_fields *fields, unsigned int value, t_list **lst)
 {
-	handle_hex(fields, lst, ft_ulltohexa(value, "0123456789ABCDEF"));
+	if (fields->precision == 0 && value == 0)
+		handle_hex(fields, lst, ft_strdup(""));
+	else
+		handle_hex(fields, lst, ft_ulltohexa(value, "0123456789ABCDEF"));
 }
