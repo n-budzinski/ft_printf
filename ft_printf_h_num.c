@@ -76,12 +76,16 @@ void	handle_dec(t_fields *fields, int value, t_list **lst)
 	if (fields->precision == 0 && value == 0)
 		ptr = ft_strdup("");
 	else
+	{
+		// if (!fields->flg_minus && fields->flg_zero)
+		// 	fields->precision = fields->width;
 		ptr = ft_padded_itoa(value, fields->precision);
+	}
 	len = ft_strlen(ptr);
 	if (fields->width > len)
 	{
 		apply_padding(fields, (void **)(&ptr), len);
-		len = fields->width;
+		len = ft_strlen(ptr);
 	}
 	ft_lst_memblock_append(lst, ptr, len);
 }

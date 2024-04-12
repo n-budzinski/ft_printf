@@ -83,10 +83,8 @@ static void	fmt_parse(char **fstring, t_list **lst, va_list ap)
 		handle_dec(fields, va_arg(ap, int), lst);
 	else if (**fstring == 'u')
 		handle_uint(fields, va_arg(ap, unsigned int), lst);
-	else if (**fstring == 'x')
-		handle_lhex(fields, va_arg(ap, unsigned int), lst);
-	else if (**fstring == 'X')
-		handle_uhex(fields, va_arg(ap, unsigned int), lst);
+	else if (**fstring == 'x' || **fstring == 'X')
+		handle_hex(fields, va_arg(ap, unsigned int), **fstring == 'X', lst);
 	else if	(**fstring == '%')
 		handle_esc(fields, lst);
 	free(fields);

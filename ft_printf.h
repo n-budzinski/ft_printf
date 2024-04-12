@@ -51,11 +51,11 @@ void ft_lst_memblock_clear(void *memblock);
 void	handle_chr(t_fields *fields, int c, t_list **lst);
 void    handle_str(t_fields *fields, char *str, t_list **lst);
 void	handle_esc(t_fields *fields, t_list **lst);
-static char	*ft_ulltohexa(unsigned long long value, char *set);
+static char	*ft_ulltohexa(unsigned long long value, int upper);
 void	handle_uint(t_fields *fields, unsigned int value, t_list **lst);
 void	handle_dec(t_fields *fields, int value, t_list **lst);
 void handle_ptr(t_fields *fields, unsigned long long value, t_list **lst);
-static void	handle_hex(t_fields *fields, t_list **lst, char *str);
+void	handle_hex(t_fields *fields, unsigned int value, int upper, t_list **lst);
 void	handle_lhex(t_fields *fields, unsigned int value, t_list **lst);
 void	handle_uhex(t_fields *fields, unsigned int value, t_list **lst);
 char	*join_and_free(char *s1, char *s2);
@@ -70,5 +70,6 @@ static void	striter(va_list ap, const char *fstring, char *str, t_list **lst);
 int	ft_printf(const char *fstring, ...);
 static char	*ft_padded_itoa(long value, int padding);
 static int	calcsize(long value, int padding);
+
 
 #endif

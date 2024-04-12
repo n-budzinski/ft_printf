@@ -23,7 +23,13 @@ void    handle_str(t_fields *fields, char *str, t_list **lst)
 	unsigned long long	len;
 
 	if (str == NULL)
-		str = ft_strdup("(null)");
+	{
+		if (fields->precision >= 6 || fields->precision == -1)
+			str = ft_strdup("(null)");
+		else
+			str = ft_strdup("");
+	
+	}
 	else
 		str = ft_strdup(str);
 	len = ft_strlen(str);
